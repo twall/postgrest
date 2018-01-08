@@ -40,9 +40,9 @@ runWithClaims conf eClaims app req =
         cookiesSql = map (pgFmtEnvVar "request.cookie.") $ iCookies req
         claimsSql = map (pgFmtEnvVar "request.jwt.claim.") [(c,unquoted v) | (c,v) <- M.toList claimsWithRole]
         setRoleSql = maybeToList $
-          (\r -> "set local role " <> r <> ";") . toS . pgFmtLit . unquoted <$> M.lookup "role" claimsWithRole
+          (\r -> "set local role " <> r <> ";") . toS . pgFmtLit . unquoted <$> M.lookup "custom:role" claimsWithRole
         -- role claim defaults to anon if not specified in jwt
-        claimsWithRole = M.union claims (M.singleton "role" anon)
+        claimsWithRole = M.union claims (M.singleton "custom:role" anon)
         anon = String . toS $ configAnonRole conf
         customReqCheck = (\f -> "select " <> toS f <> "();") <$> configReqCheck conf
   where
